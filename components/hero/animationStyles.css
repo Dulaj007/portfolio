@@ -1,0 +1,56 @@
+/* 1. Fast Spin Pause for the '+' */
+@keyframes fast-spin-pause {
+  0% { transform: rotate(0deg); }
+  8% { transform: rotate(360deg); } 
+  100% { transform: rotate(360deg); } 
+}
+.animate-spin-pause {
+  animation: fast-spin-pause 6s ease-in-out infinite; 
+}
+
+/* 2. Fade In + Slight Spin for Background */
+@keyframes fade-spin-in {
+  0% { opacity: 0; transform: scale(1.1) rotate(-8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.animate-bg-fade-spin {
+  animation: fade-spin-in 2.5s ease-out forwards;
+}
+
+/* 3. Slide In Left */
+@keyframes slide-in-left {
+  0% { opacity: 0; transform: translateX(-30vw); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-left {
+  animation: slide-in-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Slide In Right */
+@keyframes slide-in-right {
+  0% { opacity: 0; transform: translateX(30vw); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-right {
+  animation: slide-in-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 5. Reveal Down */
+@keyframes reveal-down {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+}
+.animate-reveal-down {
+  animation: reveal-down 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.3s; 
+}
+
+/* 6. Reveal Up */
+@keyframes reveal-up {
+  0% { transform: translateY(110%); }
+  100% { transform: translateY(0); }
+}
+.animate-reveal-up {
+  animation: reveal-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.6s;
+}

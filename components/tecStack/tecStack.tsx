@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText'; // Note: SplitText is a Club GSAP premium plugin
+import { SplitText } from 'gsap/SplitText';   // Note: SplitText is a Club GSAP premium plugin
 
 import {
   FaReact,

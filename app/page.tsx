@@ -2,12 +2,12 @@
    Imports
    - Sections and components used to build the page
    ========================================================= */
-import LiquidOverlay from "@/components/hero/heroBackground";
+
 import Hero from "@/components/hero/hero";
 
 import About from "@/components/about/about";
 
-import TecStack from "@/components/tecStack/tecStack";
+
 import ProjectExpand from "@/components/portfolio/ProjectExpand";
 import Footer from "@/components/footer/footer";
 
@@ -25,7 +25,6 @@ export default function Page() {
        - Black background for overall theme
        ========================================================= */
     <main className="relative bg-black">
-      
 
       {/* =========================================================
           Page Sections

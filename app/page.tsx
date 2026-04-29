@@ -1,43 +1,34 @@
-/* =========================================================
-   Imports
-   - Sections and components used to build the page
-   ========================================================= */
-import LiquidOverlay from "@/components/hero/heroBackground";
+import LiquidOverlay from "@/components/overlay/LiquidOverlay";
 import Hero from "@/components/hero/hero";
-
+import Portfolio from "@/components/portfolio/portfolio";
 import About from "@/components/about/about";
+import AboutBackground from "@/components/about/aboutBackground";
+import TechStack from "@/components/techStack/techStack";
 
-import TecStack from "@/components/tecStack/tecStack";
-import ProjectExpand from "@/components/portfolio/ProjectExpand";
-import Footer from "@/components/footer/footer";
-
-
-/* =========================================================
-   Main Page Component
-   - Composes all sections into a single layout
-   ========================================================= */
 export default function Page() {
- 
   return (
-    /* =========================================================
-       Main Wrapper
-       - Relative positioning for layered elements
-       - Black background for overall theme
-       ========================================================= */
-    <main className="relative bg-black">
+    // 1. Give the main wrapper a minimum height and a background color
+    <main className="relative">
       
 
-      {/* =========================================================
-          Page Sections
-          - Ordered layout of hero, projects, about, and footer
-          - Additional components (e.g., overlays, tech stack)
-            can be inserted here if needed
-          ========================================================= */}
-      <Hero />
-      <ProjectExpand/>
-      <About/>
-      <Footer/>
 
+       {/* 3. Render your content below the overlay*/}
+   <Hero />
+   <section className="relative pt-30 pb-60 bg-black"><TechStack /></section>
+
+
+<section className="relative h-[300vh]">
+  <div className="sticky top-0 h-screen">
+    <Portfolio />
+  </div>
+</section>
+   <section className="relative w-full h-[100vh] bg-black overflow-hidden select-none">
+            </section>
+<About />
+
+   <section className="relative w-full h-[100vh] bg-black overflow-hidden select-none">
+            </section>
+       
     </main>
   );
 }

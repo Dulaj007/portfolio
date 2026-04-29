@@ -4,6 +4,14 @@ import { useEffect, useRef } from 'react';
 
 import './heroBackground.css';
 
+/**
+ * ==========================================
+ * INTERFACE: BalatroProps
+ * ==========================================
+ * Defines the customizable properties for the WebGL background effect.
+ * Controls visual aspects like colors, spin speeds, lighting, and 
+ * interactive states (mouse interaction).
+ */
 interface BalatroProps {
   spinRotation?: number;
   spinSpeed?: number;
@@ -20,6 +28,14 @@ interface BalatroProps {
   mouseInteraction?: boolean;
 }
 
+/**
+ * ==========================================
+ * HELPER: hexToVec4
+ * ==========================================
+ * Converts a standard hex color string (e.g., '#ff0e00') into a
+ * WebGL-compatible 4-dimensional vector array (RGBA).
+ * Handles both 6-character and 8-character (with alpha) hex codes.
+ */
 function hexToVec4(hex: string): [number, number, number, number] {
   let hexStr = hex.replace('#', '');
   let r = 0,
@@ -39,6 +55,13 @@ function hexToVec4(hex: string): [number, number, number, number] {
   return [r, g, b, a];
 }
 
+/**
+ * ==========================================
+ * SHADER: Vertex
+ * ==========================================
+ * A standard passthrough vertex shader. Takes the 2D plane coordinates
+ * and passes the UV mapping to the fragment shader.
+ */
 const vertexShader = `
 attribute vec2 uv;
 attribute vec2 position;
@@ -49,6 +72,14 @@ void main() {
 }
 `;
 
+/**
+ * ==========================================
+ * SHADER: Fragment
+ * ==========================================
+ * The core visual engine. Uses complex math (trigonometry, distance fields, 
+ * and iterators) driven by time and mouse position to create the swirling, 
+ * liquid-like gradient texture effect.
+ */
 const fragmentShader = `
 precision highp float;
 
@@ -123,6 +154,13 @@ void main() {
 }
 `;
 
+/**
+ * ==========================================
+ * COMPONENT: heroBackground
+ * ==========================================
+ * Main React component wrapper. Mounts the WebGL context, binds uniforms, 
+ * and handles the animation lifecycle.
+ */
 export default function heroBackground({
   spinRotation = -5.0,
   spinSpeed = 1.0,
@@ -140,15 +178,29 @@ export default function heroBackground({
 }: BalatroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * ==========================================
+   * WEBGL INITIALIZATION & LIFECYCLE
+   * ==========================================
+   */
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
+    
+    // Initialize OGL Renderer and WebGL Context
     const renderer = new Renderer();
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 1);
 
     let program: Program;
 
+/**
+ * ==========================================
+ * RESIZE HANDLER
+ * ==========================================
+ * Keeps the canvas sized to the container. Features an optimization
+ * that caps the pixel ratio to 1 on mobile devices to prevent lag.
+ */
 function resize() {
   const isMobile = window.innerWidth < 768;
 
@@ -175,6 +227,13 @@ function resize() {
     window.addEventListener('resize', resize);
     resize();
 
+    /**
+     * ==========================================
+     * GEOMETRY & PROGRAM COMPILATION
+     * ==========================================
+     * Maps the shaders to a single triangle plane filling the screen, 
+     * and binds the reactive properties (uniforms) to the program.
+     */
     const geometry = new Triangle(gl);
     program = new Program(gl, {
       vertex: vertexShader,
@@ -203,6 +262,13 @@ function resize() {
     const mesh = new Mesh(gl, { geometry, program });
     let animationFrameId: number;
 
+    /**
+     * ==========================================
+     * RENDER LOOP
+     * ==========================================
+     * Fires on every screen paint (requestAnimationFrame), updates the 
+     * time uniform, and redraws the WebGL scene.
+     */
     function update(time: number) {
       animationFrameId = requestAnimationFrame(update);
       program.uniforms.iTime.value = time * 0.001;
@@ -211,6 +277,13 @@ function resize() {
     animationFrameId = requestAnimationFrame(update);
     container.appendChild(gl.canvas);
 
+    /**
+     * ==========================================
+     * MOUSE TRACKING
+     * ==========================================
+     * Updates the 'uMouse' uniform used in the fragment shader to warp 
+     * the effect relative to the cursor's coordinates.
+     */
     function handleMouseMove(e: MouseEvent) {
       if (!mouseInteraction) return;
       const rect = container.getBoundingClientRect();
@@ -220,6 +293,13 @@ function resize() {
     }
     container.addEventListener('mousemove', handleMouseMove);
 
+    /**
+     * ==========================================
+     * CLEANUP PHASE
+     * ==========================================
+     * Cancels the animation loop, removes DOM listeners, cleans the 
+     * canvas element, and forces WebGL to dump its memory.
+     */
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resize);

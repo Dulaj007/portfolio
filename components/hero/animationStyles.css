@@ -1,4 +1,8 @@
-/* 1. Fast Spin Pause for the '+' */
+/* =========================================================
+   1. Fast Spin Pause for the '+' Icon
+   - Spins quickly at the start (0% → 8%)
+   - Then pauses for the rest of the animation
+   ========================================================= */
 @keyframes fast-spin-pause {
   0% { transform: rotate(0deg); }
   8% { transform: rotate(360deg); } 
@@ -8,7 +12,12 @@
   animation: fast-spin-pause 6s ease-in-out infinite; 
 }
 
-/* 2. Fade In + Slight Spin for Background */
+
+/* =========================================================
+   2. Fade In + Slight Spin for Background
+   - Starts slightly zoomed and rotated
+   - Fades in while settling into place
+   ========================================================= */
 @keyframes fade-spin-in {
   0% { opacity: 0; transform: scale(1.1) rotate(-8deg); }
   100% { opacity: 1; transform: scale(1) rotate(0deg); }
@@ -17,7 +26,12 @@
   animation: fade-spin-in 2.5s ease-out forwards;
 }
 
-/* 3. Slide In Left */
+
+/* =========================================================
+   3. Slide In from Left
+   - Element enters from far left (30vw)
+   - Smooth easing for modern UI feel
+   ========================================================= */
 @keyframes slide-in-left {
   0% { opacity: 0; transform: translateX(-30vw); }
   100% { opacity: 1; transform: translateX(0); }
@@ -26,7 +40,12 @@
   animation: slide-in-left 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 4. Slide In Right */
+
+/* =========================================================
+   4. Slide In from Right
+   - Mirror of slide-in-left
+   - Comes from right side (30vw)
+   ========================================================= */
 @keyframes slide-in-right {
   0% { opacity: 0; transform: translateX(30vw); }
   100% { opacity: 1; transform: translateX(0); }
@@ -35,7 +54,12 @@
   animation: slide-in-right 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 5. Reveal Down */
+
+/* =========================================================
+   5. Reveal Down
+   - Slides element downward into view
+   - Slight delay for staggered animation effect
+   ========================================================= */
 @keyframes reveal-down {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(0); }
@@ -45,7 +69,12 @@
   animation-delay: 0.3s; 
 }
 
-/* 6. Reveal Up */
+
+/* =========================================================
+   6. Reveal Up
+   - Slides element upward into view
+   - Slightly longer delay for sequencing
+   ========================================================= */
 @keyframes reveal-up {
   0% { transform: translateY(110%); }
   100% { transform: translateY(0); }

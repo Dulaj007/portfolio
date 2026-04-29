@@ -1,5 +1,11 @@
+/* =========================================================
+   Balatro Background Container
+   - Covers entire hero section
+   - Positioned behind main content
+   - Prevents interaction blocking (pointer-events: none)
+   ========================================================= */
 .balatro-container {
-  position: absolute;   /* 🔥 key change */
+  position: absolute;   
   top: 0;
   left: 0;
   width: 100%;
@@ -9,6 +15,12 @@
   pointer-events: none; /* allow clicks */
 }
 
+
+/* =========================================================
+   Canvas Styling Inside Container
+   - Forces canvas to fully stretch to container size
+   - Removes inline spacing issues with display: block
+   ========================================================= */
 .balatro-container canvas {
   width: 100% !important;
   height: 100% !important;

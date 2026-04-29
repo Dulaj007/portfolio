@@ -4,10 +4,7 @@
    ========================================================= */
 
 import Hero from "@/components/hero/hero";
-
 import About from "@/components/about/about";
-
-
 import ProjectExpand from "@/components/portfolio/ProjectExpand";
 import Footer from "@/components/footer/footer";
 

@@ -6,7 +6,7 @@
    - Lenis for smooth scrolling behavior
    ========================================================= */
 import { ReactNode, useEffect, useRef } from "react";
-import Lenis from "@studio-freight/lenis";
+import Lenis from "lenis";
 
 
 /* =========================================================

@@ -13,6 +13,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText'; 
 import Image from 'next/image';
+import Link from 'next/link';
 
 // Import the strictly typed data and interface from the constants file
 import { projects, type Project } from './projectData';
@@ -38,6 +39,7 @@ export default function ProjectExpand() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const infoRefs = useRef<(HTMLDivElement | null)[]>([]); 
   const innerProgressRefs = useRef<(SVGPathElement | null)[]>([]);
+  const topProgressRefs = useRef<(SVGPathElement | null)[]>([]);
   
   // 3D wrapper refs for each project's individual content
   const projOuterRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -66,8 +68,6 @@ export default function ProjectExpand() {
        * --------------------------------------------------
        * 1. TEXT & BUBBLE TRANSITION EFFECT
        * --------------------------------------------------
-       * Animates the background text and bubbles when the section
-       * scrolls into view (not scrubbed).
        */
       const introTl = gsap.timeline({
         scrollTrigger: {
@@ -106,7 +106,6 @@ export default function ProjectExpand() {
        * --------------------------------------------------
        * 2. 3D MOUSE HOVER EFFECT
        * --------------------------------------------------
-       * Creates a parallax 3D tilting effect based on cursor position.
        */
       if (section && textContainer && textOuter && textInner) {
         gsap.set(textContainer, { perspective: 650 });
@@ -176,7 +175,6 @@ export default function ProjectExpand() {
        * --------------------------------------------------
        * 3. SCALE VIDEO & DRAW LINE (UNPINNED)
        * --------------------------------------------------
-       * Expands the initial video box into full screen on scroll.
        */
       const scaleTl = gsap.timeline({
         scrollTrigger: {
@@ -203,15 +201,11 @@ export default function ProjectExpand() {
        * --------------------------------------------------
        * 4. PROJECT CONTENT TIMELINE (PINNED)
        * --------------------------------------------------
-       * Controls the wipe transition between the projects
-       * while the section is pinned to the screen.
        */
-      
-      // Setup initial states for the full-screen wipe effect
       for (let i = 1; i < projects.length; i++) {
-        gsap.set(wipeOuterRefs.current[i], { yPercent: 100 }); // Push mask window down
-        gsap.set(wipeInnerRefs.current[i], { yPercent: -100 }); // Push content up to counteract mask
-        gsap.set(videoRefs.current[i], { yPercent: 15, opacity: 0.8 }); // Video parallax start position
+        gsap.set(wipeOuterRefs.current[i], { yPercent: 100 }); 
+        gsap.set(wipeInnerRefs.current[i], { yPercent: -100 }); 
+        gsap.set(videoRefs.current[i], { yPercent: 15, opacity: 0.8 }); 
       }
       gsap.set(videoRefs.current[0], { opacity: 0.8 }); 
 
@@ -233,62 +227,44 @@ export default function ProjectExpand() {
       }, 0);
 
       for (let i = 1; i < projects.length; i++) {
-        // 4A. Animate the scroll line of the previous project
-        pinTl.to(innerProgressRefs.current[i - 1], {
-          strokeDashoffset: 0,
-          ease: 'none',
-        });
+        const phaseLabel = `scrollLine-${i}`;
+        const wipeLabel = `wipe-${i}`;
 
-        // 4B. Fade out previous text content
-        pinTl.to(infoRefs.current[i - 1], {
-          opacity: 0,
-          y: -20,
-          ease: 'power1.inOut',
-        });
+        // 4A. Animate scroll lines (Scroll Down = Bottom Fills, Top Empties)
+        pinTl.to(innerProgressRefs.current[i - 1], { strokeDashoffset: 0, ease: 'none' }, phaseLabel);
+        pinTl.to(topProgressRefs.current[i - 1], { strokeDashoffset: 100, ease: 'none' }, phaseLabel);
+
+        // 4B. Fade out previous text content (Overlaps slightly with wipe)
+        pinTl.to(infoRefs.current[i - 1], { opacity: 0, y: -20, ease: 'power1.inOut' }, wipeLabel);
 
         // 4C. Execute full-screen wipe transition for the next project
-        pinTl.to(wipeOuterRefs.current[i], {
-          yPercent: 0,
-          ease: 'power2.inOut',
-        }, '<'); 
+        pinTl.to(wipeOuterRefs.current[i], { yPercent: 0, ease: 'power2.inOut' }, wipeLabel); 
+        pinTl.to(wipeInnerRefs.current[i], { yPercent: 0, ease: 'power2.inOut' }, wipeLabel);
+        pinTl.to(videoRefs.current[i], { yPercent: 0, ease: 'power2.out' }, wipeLabel); 
 
-        pinTl.to(wipeInnerRefs.current[i], {
-          yPercent: 0,
-          ease: 'power2.inOut',
-        }, '<');
+        // Hide previous video to prevent it from playing underneath & bleeding through.
+        pinTl.to(videoRefs.current[i - 1], { opacity: 0, ease: 'power2.inOut' }, `${wipeLabel}+=0.3`);
 
-        pinTl.to(videoRefs.current[i], {
-          yPercent: 0,
-          ease: 'power2.out', 
-        }, '<'); 
-
-        // 4D. Fade in new text content
+        // 4D. Fade in new text content much faster (Overlaps the end of the wipe transition)
         pinTl.to(infoRefs.current[i], {
           opacity: 1,
           y: 0,
           ease: 'power2.out',
-        });
+        }, `${wipeLabel}+=0.2`);
       }
 
-      // Final cleanup animation to hide the very last scroll indicator
-// 4E. Final cleanup animation to hide the very last scroll indicator
-      const lastProgressRef = innerProgressRefs.current[projects.length - 1] as Element | null;
-      const lastIndicator = lastProgressRef?.closest('.inner-scroll-indicator');
+      // 4E. Final cleanup animation to hide the very last scroll indicators
+      const lastBottomProgress = innerProgressRefs.current[projects.length - 1];
+      const lastTopProgress = topProgressRefs.current[projects.length - 1];
       
-      if (lastIndicator) {
-        pinTl.to(lastIndicator, {
-          opacity: 0,
-          ease: 'power1.in',
-        });
-      }
+      const lastBottomIndicator = lastBottomProgress?.closest('.inner-scroll-indicator');
+      const lastTopIndicator = lastTopProgress?.closest('.inner-scroll-indicator-top');
+      
+      if (lastBottomIndicator) pinTl.to(lastBottomIndicator, { opacity: 0, ease: 'power1.in' }, 'final-cleanup');
+      if (lastTopIndicator) pinTl.to(lastTopIndicator, { opacity: 0, ease: 'power1.in' }, 'final-cleanup');
 
     }, sectionRef);
 
-    /**
-     * --------------------------------------------------
-     * 5. CLEANUP
-     * --------------------------------------------------
-     */
     return () => {
       if (splitTitles) splitTitles.revert();
       if (section) {
@@ -383,40 +359,59 @@ export default function ProjectExpand() {
               {/* Project Info Overlay */}
               <div 
                 ref={(el) => { infoRefs.current[index] = el; }}
-                className="absolute inset-0 z-30 flex flex-col items-center justify-center opacity-0 translate-y-10 bg-black/40 pointer-events-none"
+                className="absolute inset-0 z-30 flex flex-col items-center justify-center opacity-0 translate-y-10 bg-black/60 pointer-events-none"
               >
                 <div ref={(el) => { projOuterRefs.current[index] = el; }} className="w-full flex flex-col items-center justify-center">
                   <div ref={(el) => { projInnerRefs.current[index] = el; }} className="w-full flex flex-col items-center justify-center">
                     
-                    <div className="mb-4 drop-shadow-xl">
+                    <div className="mb-2 drop-shadow-xl">
                       {project.isLogo ? (
-                        <Image src={project.title} alt="Project Logo" width={300} height={100} className="object-contain w-auto h-16 md:h-24" />
+                        <Image src={project.title} alt="Project Logo" width={500} height={100} className="object-contain w-auto h-30 md:h-50" />
                       ) : (
-                        <h3 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter text-center">
+                        <h3 className="text-5xl mb-2 md:text-8xl font-black text-white uppercase tracking-tighter text-center">
                           {project.title}
                         </h3>
                       )}
                     </div>
 
-                    <p className="text-xl md:text-2xl text-gray-200 font-medium tracking-wide mb-10 text-center drop-shadow-md">
+                    <p className="text-xl md:text-3xl px-5 text-gray-200 font-medium tracking-wide mb-5 text-center drop-shadow-md">
                       {project.subtitle}
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 pointer-events-auto drop-shadow-lg">
-                      <button className="px-8 py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-gray-200 transition-colors uppercase tracking-wider">
+                      <Link href={project.caseStudyLink} className="px-6 sm:px-8 py-3  sm:py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-gray-200 transition-colors uppercase tracking-wider text-center">
                         See Case Study
-                      </button>
-                      <button className="px-8 py-4 rounded-full border-2 border-white text-white font-bold text-lg hover:bg-white hover:text-black transition-colors uppercase tracking-wider bg-black/20 backdrop-blur-sm">
+                      </Link>
+                      <Link href={project.liveSiteLink} className="px-6 sm:px-8 py-3  sm:py-4 rounded-full border-2 border-white text-white font-bold text-lg hover:bg-white hover:text-black transition-colors uppercase tracking-wider bg-black/20 backdrop-blur-sm text-center">
                         {project.customButtonText}
-                      </button>
+                      </Link>
                     </div>
 
-                  </div>
+                {/* Top Scroll Indicator (Animates on Scroll Up) */}
+                <div className="inner-scroll-indicator-top absolute -top-20 flex flex-col items-center justify-center w-[150px] h-[75px]">
+                  <span className="absolute top-10 text-white text-sm md:text-base font-medium tracking-widest">
+                    Scroll
+                  </span>
+                  <svg viewBox="0 0 200 100" className="absolute inset-0 w-full h-full overflow-visible">
+                    {/* Upside Down Curve Base */}
+                    <path d="M 20 80 Q 100 -20 180 80" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="6" strokeLinecap="round" />
+                    <path 
+                      ref={(el) => { topProgressRefs.current[index] = el; }}
+                      d="M 20 80 Q 100 -20 180 80" 
+                      fill="none" 
+                      stroke="#dc2626" 
+                      strokeWidth="6" 
+                      strokeLinecap="round" 
+                      pathLength="100" 
+                      strokeDasharray="100" 
+                      strokeDashoffset="0" 
+                    />
+                  </svg>
                 </div>
 
-                {/* Inner Scroll Progress Indicator (Per Project) */}
-                <div className="inner-scroll-indicator absolute bottom-4 md:bottom-10 flex flex-col items-center justify-center w-[150px] h-[75px]">
-                  <span className="absolute bottom-2 md:bottom-6 text-white text-sm md:text-base font-medium tracking-widest">
+                {/* Inner Scroll Progress Indicator (Animates on Scroll Down) */}
+                <div className="inner-scroll-indicator absolute -bottom-30 flex flex-col items-center justify-center w-[150px] h-[75px]">
+                  <span className="absolute bottom-10 text-white text-sm md:text-base font-medium tracking-widest">
                     Scroll
                   </span>
                   <svg viewBox="0 0 200 100" className="absolute inset-0 w-full h-full overflow-visible">
@@ -434,6 +429,9 @@ export default function ProjectExpand() {
                     />
                   </svg>
                 </div>
+                  </div>
+                </div>
+
               </div>
 
             </div>

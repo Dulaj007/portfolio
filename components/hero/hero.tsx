@@ -122,6 +122,7 @@ export default function Hero() {
     /**
      * TECH STACK 3D MOUSE PARALLAX EFFECT
      * Similar to the hero text, but localized to the dimensions of the Tech Stack container.
+     * Effect is dynamically disabled on mobile screens (width < 768px).
      */
     const techContainer = techContainerRef.current;
     const techOuter = techOuterRef.current;
@@ -139,6 +140,15 @@ export default function Hero() {
       const tInnerY = gsap.quickTo(techInner, "y", { ease: "power3" });
 
       handleTechPointerMove = (e: PointerEvent) => {
+        // Disable 3D parallax on mobile screens (width < 768px) and safely reset values
+        if (window.innerWidth < 768) {
+          tOuterRX(0);
+          tOuterRY(0);
+          tInnerX(0);
+          tInnerY(0);
+          return;
+        }
+
         // Calculate cursor position relative to the tech container itself, not the whole window
         const rect = techContainer.getBoundingClientRect();
         const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));

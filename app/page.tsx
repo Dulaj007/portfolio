@@ -30,9 +30,13 @@ export default function Page() {
             can be inserted here if needed
           ========================================================= */}
       <Hero />
-      <ProjectExpand/>
+     <section id="work">
+      <ProjectExpand />
+    </section>
       <About/>
-      <Footer/>
+     <section id="connect">
+  <Footer />
+</section>
 
     </main>
   );
